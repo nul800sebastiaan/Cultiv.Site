@@ -1,0 +1,86 @@
+﻿@using Cultiv.Site.Extensions
+
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Cultiv.Site.Models.BlogOverviewModel>
+
+@{
+    Layout = "~/Views/_Layout.cshtml";
+    var blogTitle = "Cultiv Blog RSS";
+    var blogFeedLink = "/?altTemplate=BlogRss";
+}
+@*
+@if(_configuration is IConfigurationRoot configurationRoot)
+{
+    <pre>
+        @configurationRoot.GetDebugView();
+    </pre>
+}
+*@
+
+@section head {
+    <link rel="alternate" type="application/rss+xml" title="@blogTitle" href="@blogFeedLink" />
+}
+
+@foreach (var post in Model.PagedBlogPosts)
+{
+    <section class="post-wrapper" itemscope itemtype="http://schema.org/Article">
+        <article class="post">
+            <header class="post-header">
+                <span class="post-date" itemprop="datePublished" content="@post.CreateDate.ToString("yyyy-MM-dd")">
+                    <time datetime="@post.CreateDate.ToString("yyyy-MM-dd")">@post.CreateDate.ToString("MMMM dd")</time>
+                    <span class="post-date-year">@post.CreateDate.Year</span>
+                </span>
+
+                <h2 class="post-title" itemprop="name"><a itemprop="url" href="@post.Url()">@post.Name</a></h2>
+
+                <span class="post-meta">
+                    @if (post.Children().Any())
+                    {
+                        var commentCount = post.Children.Count();
+                        var commentString = commentCount == 1 ? "comment" : "comments";
+                        <a href="@(post.Url())#comments">@commentCount @commentString</a>
+                    }
+                </span>
+            </header>
+
+            <section class="post-content">
+                <section class="post-excerpt">
+                    @{
+                        var image = post.Value<IPublishedContent>("image");
+                        if (image != null)
+                        {
+                            <a href="@Umbraco.Media(image.Id).Url()" class="blog-overview">
+                                <img itemprop="image" src="@(Umbraco.Media(image.Id).Url())?width=80&amp;height=80&amp;mode=crop" height="80" width="80" alt="@post.Name" title="@post.Name" class="imgRight illustration" />
+                            </a>
+                        }
+                    }
+
+                    <p itemprop="articleBody">@(post.BodyText.GetSummary(50))...</p>
+                    
+                    <footer class="footer-post">
+                        <a class="read-more" href="@post.Url()">Read More</a>
+                    </footer> <!-- /end .footer-post -->
+
+                </section>
+            </section>
+        </article>
+    </section>
+    <!-- /end .post-wrapper -->
+}
+
+<section class="pagination-wrapper">
+    <nav class="pagination" role="pagination">
+
+        @if (Model.IsFirstPage == false)
+        {
+            <a class="newer-posts" href="?page=@Model.PreviousPage">&larr; Newer Posts</a>
+        }
+
+        <span class="page-number">Page <span class="number">@Model.Page</span> of <span class="number">@Model.TotalPages</span></span>
+
+        @if (Model.IsLastPage == false)
+        {
+            <a class="older-posts" href="?page=@Model.NextPage">Older Posts &rarr;</a>
+        }
+
+    </nav>
+</section>

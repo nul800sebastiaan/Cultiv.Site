@@ -1,0 +1,72 @@
+﻿@inherits UmbracoViewPage
+@inject Umbraco.Cms.Core.Configuration.IUmbracoVersion umbracoVersion;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+
+    <title>@Model.Name | Cultiv</title>
+
+    <meta name="HandheldFriendly" content="True"/>
+    <meta name="MobileOptimized" content="320"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="google-site-verification" content="gT9HfcoVWY4Y1AZh2xEAtzaN2BE76v6LOsatc_HeZa0"/>
+    <link rel="stylesheet" type="text/css" href="~/css/normalize.css" /> 
+    <link rel="stylesheet" type="text/css" href="~/css/screen.css" /> 
+    @RenderSection("head", required: false)
+</head>
+
+<body class="@(Model.ContentType.Alias == "BlogOverview" ? "archive-template" : "post-template")">
+<main class="content" role="main">
+    <header class="post-header logo">
+        <section class="inner">
+            <a id="blog-logo" href="/">
+                <img src="/images/logo.png" alt="Blog Logo"/>
+            </a>
+        </section>
+    </header>
+    @RenderBody()
+</main>
+
+<footer class="site-footer">
+    <div class="inner">
+        <section class="poweredby" itemscope itemtype="http://schema.org/Organization">
+            Proudly published with
+            <a href="http://umbraco.com" target="_blank">
+                <span itemprop="publisher">
+                    <span itemprop="name">Umbraco</span>
+                </span>
+            </a> @umbracoVersion.Version @(!string.IsNullOrWhiteSpace(umbracoVersion.Comment) ? "- " + umbracoVersion.Comment : null) | Find me on <a rel="me" href="https://cultiv.social/@@sebastiaan">Mastodon</a>
+        </section>
+    </div> <!-- /end .inner -->
+    <div style="display: none;">
+    </div>
+</footer> <!-- /end .site-footer -->
+
+<p id="back-top">
+    <a href="#top">
+        <span></span>
+    </a>
+</p>
+
+<script type="application/javascript" src="~/scripts/jquery.js"></script>
+<script type="application/javascript" src="~/scripts/index.js"></script>
+<script type="application/javascript" src="~/scripts/jquery.jscroll.min.js"></script>
+<script type="application/javascript" src="~/scripts/jquery.validate.min.js"></script>
+<script type="application/javascript" src="~/scripts/jquery.validate.unobtrusive.min.js"></script>
+<script type="application/javascript" src="~/scripts/all.min.js"></script>
+
+<script type="text/javascript">
+        (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://ssl.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-589596-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+</body>
+</html>

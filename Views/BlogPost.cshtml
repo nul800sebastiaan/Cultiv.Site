@@ -1,0 +1,125 @@
+﻿@using System.Security.Cryptography
+@using System.Text
+@using Cultiv.Site.Extensions
+@inherits UmbracoViewPage<Umbraco.Cms.Web.Common.PublishedModels.BlogPost>
+@{
+    Layout = "~/Views/_Layout.cshtml";
+
+    var pageTitle = Model.PageTitle;
+    if (string.IsNullOrWhiteSpace(pageTitle))
+    {
+        pageTitle = Model.Name;
+    }
+}
+<article class="post" itemscope itemtype="http://schema.org/Article">
+    <span itemscope itemtype="http://schema.org/Article">
+        <span itemprop="articleSection">
+            <span class="post-date" itemprop="datePublished" content="@Model.CreateDate.ToString("yyyy-MM-dd")">
+                <time datetime="@Model.CreateDate.ToString("yyyy-MM-dd")">@Model.CreateDate.ToString("MMMM dd")</time>
+                <span class="post-date-year">@Model.CreateDate.Year</span>
+            </span>
+
+            <h1 itemprop="name" class="post-title">@pageTitle</h1>
+
+            <section class="post-content" itemprop="articleBody">
+                @{
+                    var imageId = Model.Value<int>("image");
+                    if (imageId != 0)
+                    {
+                        <a href="@Umbraco.Media(imageId).Url()">
+                            <img itemprop="image" src="@(Umbraco.Media(imageId).Url())?width=80&amp;height=80&amp;mode=crop" height="80" width="80" alt="@Model.Name" title="@Model.Name" class="imgLeft illustration"/>
+                        </a>
+                    }
+                }
+
+                @if (Model.Value<bool>("stillRelevant") != true && DateTime.Now.AddMonths(-12) >= Model.CreateDate)
+                {
+                    <div class="stale-warning">Note: this post is over a year old, it's very likely completely outdated and should probably not be used as reference any more. You have been warned. :-)</div>
+                }
+                
+                @Model.BodyText.RemoveInlineImageStyles()
+            </section>
+        </span>
+    </span>
+
+    <footer class="post-footer">
+        <section class="author">
+            <span class="author-picture">
+                <a href="https://plus.google.com/+SebastiaanJanssen?rel=author" target="_blank"><img src="//www.gravatar.com/avatar/de0b0c425a612a14b0dfd8a19d35be3f?d=404" alt="Sebastiaan Janssen" /></a>
+            </span>
+
+            <span class="author-content" itemscope itemtype="http://schema.org/Person">
+                <h4 itemprop="author">
+                    <a itemprop="name" href="https://plus.google.com/+SebastiaanJanssen?rel=author" target="_blank">Sebastiaan Janssen</a>
+                </h4>
+                <p class="author-bio">@(Model.AncestorOrSelf(1).Value<string>("bio"))</p>
+            </span> <!-- /end .author-content -->
+        </section>
+    </footer>
+    
+    <section class="comments" id="comments">
+        <div id='discourse-comments'></div>
+        <meta name='discourse-username' content='cultiv'>
+
+        <script type="text/javascript">
+        DiscourseEmbed = {
+            discourseUrl: 'https://discourse.cork.nl/',
+            discourseEmbedUrl: 'https://cultiv.nl@(Model.Url())'
+        };
+
+        (function() {
+            var d = document.createElement('script'); d.type = 'text/javascript'; d.async = true;
+            d.src = DiscourseEmbed.discourseUrl + 'javascripts/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(d);
+        })();
+        </script>
+		
+        @if (Model.Children().Any())
+        {
+            <p>&nbsp;</p>
+            <h2>@Model.Children().Count() comments on this article</h2>
+            <div class="comments">
+                @foreach (var comment in Model.Children())
+                {
+                    <div class="comment" id="comment-@comment.Id">
+                        <p>
+                            <a href="#comments-@comment.Id">
+                                <img src="https://www.gravatar.com/avatar/@(HashEmailForGravatar(comment.Value<string>("commenterEmail")))" alt="Avatar for @(comment.Value<string>("commenterName"))" height="80" width="80" class="imgRight" />
+                            </a>
+                            <strong>
+                                @(comment.Value<string>("commenterName")) <span class="comment-date">| @comment.CreateDate.ToString("MMMM d yyy") @comment.CreateDate.ToString("HH:mm")</span>
+                            </strong>
+                            <br />
+                            @Html.Raw(comment.Value<string>("comment").Replace("\n", "<br />"))
+                        </p>
+                    </div>
+                    <div class="comment-break"></div>
+                }
+            </div>
+        }
+    </section>
+</article>
+
+@functions {
+    public static string HashEmailForGravatar(string email)
+    {
+        // Create a new instance of the MD5CryptoServiceProvider object.
+        MD5 md5Hasher = MD5.Create();
+
+        // Convert the input string to a byte array and compute the hash.
+        byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(email));
+
+        // Create a new Stringbuilder to collect the bytes
+        // and create a string.
+        StringBuilder sBuilder = new StringBuilder();
+
+        // Loop through each byte of the hashed data
+        // and format each one as a hexadecimal string.
+        for (int i = 0; i < data.Length; i++)
+        {
+            sBuilder.Append(data[i].ToString("x2"));
+        }
+
+        return sBuilder.ToString();  // Return the hexadecimal string.
+    }
+}
