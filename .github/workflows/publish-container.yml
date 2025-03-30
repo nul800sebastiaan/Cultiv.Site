@@ -11,9 +11,7 @@ on:
 
 jobs:
       build_and_push:
-        runs-on: ubuntu-latest
-        env:
-          DOCKER_TARGET_PLATFORM: linux/arm/v8
+        runs-on:  ubuntu-24.04-arm
         permissions:
           contents: read
           packages: write        
@@ -33,7 +31,7 @@ jobs:
 
           - name: 'Build site Image'
             run: |
-              docker build . --tag ghcr.io/nul800sebastiaan/site:latest
+              docker . --tag ghcr.io/nul800sebastiaan/site:latest
               docker push ghcr.io/nul800sebastiaan/site:latest
 
 
