@@ -1,15 +1,19 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+#USER root
+#RUN apt update
+#RUN apt-get -y install qemu-user qemu-user-static gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu binutils-aarch64-linux-gnu-dbg build-essential
+#USER $APP_UID
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Cultiv.csproj", "."]
 RUN dotnet restore "./Cultiv.csproj"
 COPY . .
 WORKDIR "/src"
-RUN dotnet build "./Cultiv.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./Cultiv.csproj" -c $BUILD_CONFIGURATION -o /app/build 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "Cultiv.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=true
