@@ -31,7 +31,7 @@ jobs:
 
           - name: 'Build site Image'
             run: |
-              docker . --tag ghcr.io/nul800sebastiaan/site:latest
+              docker build . --tag ghcr.io/nul800sebastiaan/site:latest
               docker push ghcr.io/nul800sebastiaan/site:latest
 
 
