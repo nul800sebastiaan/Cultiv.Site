@@ -1,0 +1,24 @@
+services:
+  cultiv-site:
+    environment:
+      - Umbraco__CMS__Security__BackOfficeHost=https://cultiv.nl
+    container_name: cultiv-site
+    image: ghcr.io/nul800sebastiaan/site:latest
+    restart: unless-stopped
+    volumes:
+      - data-cultiv-site:/app/umbraco/Data
+      - logs-cultiv-site:/app/umbraco/Logs
+      - media-cultiv-site:/app/wwwroot/media
+      - dataprotection-cultiv-site:/home/app/.aspnet/DataProtection-Keys
+    networks:
+      - shared
+
+volumes:
+  data-cultiv-site:
+  logs-cultiv-site:
+  media-cultiv-site:
+  dataprotection-cultiv-site:
+
+networks:
+  shared:
+    external: true
